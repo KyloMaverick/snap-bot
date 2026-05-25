@@ -3,12 +3,12 @@ SNAP BOT - RAILWAY WORKER (FIXED)
 Bot jalan 24/7 tanpa input, auto restart jika error
 """
 
+import cmd_handler
+cmd_handler.start()
+
 import time
 import sys
 import os
-
-import cmd_bot
-cmd_bot.start()
 
 # Tambahkan path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
