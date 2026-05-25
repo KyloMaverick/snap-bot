@@ -39,9 +39,9 @@ while True:
         print("🔄 Restarting in 10 seconds...\n")
         time.sleep(10)
 
-from monitoring.telegram_bot import TelegramMenuBot
+from monitoring.telegram_bot import SimpleTelegramBot
 
 # ... setelah bot = SnapBot(...)
-cmd_bot = TelegramMenuBot(telegram.bot_token, bot)
+tg_bot = SimpleTelegramBot(telegram.bot_token, bot)
 import threading
-threading.Thread(target=cmd_bot.run, daemon=True).start()
+threading.Thread(target=tg_bot.run, daemon=True).start()
