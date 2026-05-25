@@ -7,7 +7,8 @@ import time
 import sys
 import os
 
-import simple_cmd_bot
+import cmd_bot
+cmd_bot.start()
 
 # Tambahkan path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
