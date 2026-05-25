@@ -17,10 +17,8 @@ print("Mode: SAFE (4% threshold)")
 print("Paper Mode: ON")
 print("=" * 60)
 
-# Jalankan bot langsung dengan mode SAFE
 bot = SnapBot(mode="SAFE", paper_mode=True)
 
-# Loop infinite
 while True:
     try:
         bot.scan_and_trade()
