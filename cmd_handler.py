@@ -1,14 +1,18 @@
 import requests
-import threading
 import time
+import threading
+from config import TELEGRAM_BOT_TOKEN
 
-TOKEN = "7220766351:AAHn0djbRMW2r-OmdPdsHxZkCvyPT2yYx5w"
+TOKEN = TELEGRAM_BOT_TOKEN
 last_id = 0
 
-def kirim(chat_id, teks):
+def send(chat_id, text):
     try:
-        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
-        requests.post(url, json={"chat_id": chat_id, "text": teks})
+        requests.post(
+            f"https://api.telegram.org/bot{TOKEN}/sendMessage",
+            json={"chat_id": chat_id, "text": text},
+            timeout=5
+        )
     except:
         pass
 
@@ -18,18 +22,18 @@ def loop():
         try:
             url = f"https://api.telegram.org/bot{TOKEN}/getUpdates"
             r = requests.get(url, params={"offset": last_id + 1, "timeout": 10})
-            for u in r.json().get("result", []):
-                last_id = u["update_id"]
-                msg = u.get("message")
+            for upd in r.json().get("result", []):
+                last_id = upd["update_id"]
+                msg = upd.get("message")
                 if msg and "text" in msg:
                     chat = msg["chat"]["id"]
-                    teks = msg["text"].lower()
-                    if teks == "/status":
-                        kirim(chat, "✅ Bot aktif | Mode SAFE | Balance $15.80")
-                    elif teks == "/start":
-                        kirim(chat, "🤖 SNAP Bot ready. Kirim /status")
-                    elif teks == "/balance":
-                        kirim(chat, "💰 Balance: $15.80")
+                    txt = msg["text"].lower()
+                    if txt == "/status":
+                        send(chat, "✅ Bot aktif | Mode SAFE | Balance $15.80")
+                    elif txt == "/start":
+                        send(chat, "🤖 SNAP Bot ready. Kirim /status")
+                    elif txt == "/balance":
+                        send(chat, "💰 Balance: $15.80")
         except:
             pass
         time.sleep(2)
