@@ -15,7 +15,7 @@ print("=" * 60)
 cmd_handler.start()
 
 # START TRADING BOT
-bot = SnapBot(mode="SAFE", paper_mode=True)
+bot = SnapBot(mode="AGGRESSIVE", paper_mode=True)
 
 while True:
     try:
