@@ -21,7 +21,7 @@ class PaperTrader:
         # Parameter simulasi
         self.take_profit_pct = 3.0   # +3% exit
         self.stop_loss_pct = -3.0    # -3% exit
-        self.max_hold_hours = 24     # FIX 3: Max 24 jam hold
+        self.max_hold_hours = 6     # FIX 3: Max 6 jam hold
     
     def execute_trade(self, market: Dict, side: str, size: float, entry_price: float) -> Dict:
         """Eksekusi trade (simulasi)"""
