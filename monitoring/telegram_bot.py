@@ -2,23 +2,24 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from telegram import Update, BotCommand
+from telegram import BotCommand, Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+import threading
 import asyncio
 
-class TelegramMenuBot:
+class SimpleTelegramBot:
     def __init__(self, token: str, snap_bot):
         self.token = token
         self.snap_bot = snap_bot
-        self.app = None
+        self.application = None
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
-            "🤖 *SNAP BOT AKTIF*\\n\\nKirim perintah:\\n"
-            "/status – kondisi bot\\n"
-            "/balance – saldo & profit\\n"
+            "🤖 *SNAP BOT* aktif\\n\\n"
+            "/status – status bot\\n"
+            "/balance – saldo\\n"
             "/positions – posisi terbuka\\n"
-            "/pnl – ringkasan profit\\n"
+            "/pnl – profit/loss\\n"
             "/help – bantuan",
             parse_mode="MarkdownV2"
         )
@@ -26,21 +27,17 @@ class TelegramMenuBot:
     async def status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         stats = self.snap_bot.paper_trader.get_stats()
         msg = (
-            f"✅ *STATUS BOT*\\n"
+            f"✅ *STATUS*\\n"
             f"Mode: {self.snap_bot.mode}\\n"
             f"Balance: ${stats['balance']:.2f}\\n"
-            f"Open positions: {stats['open_positions']}\\n"
+            f"Open: {stats['open_positions']}\\n"
             f"Winrate: {stats['winrate']}%"
         )
         await update.message.reply_text(msg, parse_mode="MarkdownV2")
 
     async def balance(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         stats = self.snap_bot.paper_trader.get_stats()
-        msg = (
-            f"💰 *BALANCE*\\n"
-            f"Saldo: ${stats['balance']:.2f}\\n"
-            f"Total PnL: ${stats['total_pnl']:+.2f}"
-        )
+        msg = f"💰 *BALANCE*\\nSaldo: ${stats['balance']:.2f}\\nTotal PnL: ${stats['total_pnl']:+.2f}"
         await update.message.reply_text(msg, parse_mode="MarkdownV2")
 
     async def positions(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -57,7 +54,7 @@ class TelegramMenuBot:
     async def pnl(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         stats = self.snap_bot.paper_trader.get_stats()
         msg = (
-            f"📊 *PNL REPORT*\\n"
+            f"📊 *PNL*\\n"
             f"Realized PnL: ${stats['total_pnl']:+.2f}\\n"
             f"Winrate: {stats['winrate']}%\\n"
             f"Wins/Losses: {stats['winning_trades']}/{stats['losing_trades']}"
@@ -67,37 +64,36 @@ class TelegramMenuBot:
     async def help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         await self.start(update, context)
 
-    async def set_menu_commands(self):
-        if not self.app:
+    async def set_commands(self):
+        if not self.application:
             return
-        commands = [
-            BotCommand("start", "Mulai dan lihat status"),
+        await self.application.bot.set_my_commands([
+            BotCommand("start", "Mulai bot"),
             BotCommand("status", "Status bot & balance"),
             BotCommand("balance", "Lihat saldo"),
             BotCommand("positions", "Lihat posisi terbuka"),
-            BotCommand("pnl", "Lihat profit/loss"),
+            BotCommand("pnl", "Profit/loss"),
             BotCommand("help", "Bantuan"),
-        ]
-        await self.app.bot.set_my_commands(commands)
+        ])
 
     def run(self):
         if not self.token or self.token == "YOUR_BOT_TOKEN_HERE":
             print("⚠️ Telegram token tidak dikonfigurasi")
             return
 
-        self.app = Application.builder().token(self.token).build()
-        self.app.add_handler(CommandHandler("start", self.start))
-        self.app.add_handler(CommandHandler("status", self.status))
-        self.app.add_handler(CommandHandler("balance", self.balance))
-        self.app.add_handler(CommandHandler("positions", self.positions))
-        self.app.add_handler(CommandHandler("pnl", self.pnl))
-        self.app.add_handler(CommandHandler("help", self.help))
+        self.application = Application.builder().token(self.token).build()
+        self.application.add_handler(CommandHandler("start", self.start))
+        self.application.add_handler(CommandHandler("status", self.status))
+        self.application.add_handler(CommandHandler("balance", self.balance))
+        self.application.add_handler(CommandHandler("positions", self.positions))
+        self.application.add_handler(CommandHandler("pnl", self.pnl))
+        self.application.add_handler(CommandHandler("help", self.help))
 
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.set_menu_commands())
-        loop.run_until_complete(self.app.initialize())
-        loop.run_until_complete(self.app.start())
+        loop.run_until_complete(self.set_commands())
+        loop.run_until_complete(self.application.initialize())
+        loop.run_until_complete(self.application.start())
 
-        print("✅ Telegram menu bot aktif (polling)")
+        print("✅ Telegram command bot polling started")
         loop.run_forever()
