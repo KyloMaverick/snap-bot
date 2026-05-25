@@ -38,3 +38,8 @@ while True:
         print(f"❌ Error: {e}")
         print("🔄 Restarting in 10 seconds...\n")
         time.sleep(10)
+
+from monitoring.telegram_bot import start_telegram_bot
+
+# ... setelah bot = SnapBot(...)
+cmd_bot = start_telegram_bot(bot)
