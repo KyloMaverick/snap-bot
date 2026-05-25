@@ -1,17 +1,19 @@
 """
-Simple Telegram Command Bot - Tanpa asyncio
+SIMPLE TELEGRAM COMMAND HANDLER
+Menjawab /status, /start, /balance
 """
 
 import requests
-import time
 import threading
+import time
+from config import TELEGRAM_BOT_TOKEN
 
-TOKEN = "8967861560:AAEGe_Y4Jqn7BB0WIpgYnvlm8eIFjQcPVu8"  # Ganti dengan token bot lo
+TOKEN = TELEGRAM_BOT_TOKEN
 last_update_id = 0
 
 def send_message(chat_id, text):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     try:
+        url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
         requests.post(url, json={"chat_id": chat_id, "text": text}, timeout=5)
     except Exception as e:
         print(f"Send error: {e}")
@@ -29,9 +31,9 @@ def get_updates():
                 chat_id = msg["chat"]["id"]
                 text = msg["text"].lower()
                 if text == "/status":
-                    send_message(chat_id, "✅ Bot aktif | Mode: SAFE | Balance: $15.80")
+                    send_message(chat_id, "✅ Bot aktif | Mode SAFE | Balance: $15.80")
                 elif text == "/start":
-                    send_message(chat_id, "🤖 SNAP Bot ready. Ketik /status")
+                    send_message(chat_id, "🤖 SNAP Bot ready. Kirim /status atau /balance")
                 elif text == "/balance":
                     send_message(chat_id, "💰 Balance: $15.80 | PnL: $0.00")
                 elif text == "/help":
@@ -40,7 +42,7 @@ def get_updates():
         print(f"Get updates error: {e}")
 
 def run_polling():
-    print("✅ Telegram simple bot polling started")
+    print("✅ Telegram command handler started (polling mode)")
     while True:
         try:
             get_updates()
