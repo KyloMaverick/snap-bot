@@ -1,5 +1,5 @@
 """
-Worker untuk Railway - Bot jalan otomatis tanpa input
+Worker untuk Railway - Bot jalan terus 24/7
 """
 
 import time
@@ -19,14 +19,14 @@ print("=" * 60)
 
 bot = SnapBot(mode="SAFE", paper_mode=True)
 
+# Jalankan loop forever
 while True:
     try:
+        print("\n[INFO] Starting scan cycle...")
         bot.scan_and_trade()
-        print("⏳ Waiting 30 seconds...")
+        print("[INFO] Cycle complete. Waiting 30 seconds...")
         time.sleep(30)
-    except KeyboardInterrupt:
-        print("\n🛑 Bot stopped")
-        break
     except Exception as e:
-        print(f"❌ Error: {e}")
-        time.sleep(30)
+        print(f"[ERROR] {e}")
+        print("[INFO] Restarting in 10 seconds...")
+        time.sleep(10)
