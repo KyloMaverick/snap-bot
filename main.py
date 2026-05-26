@@ -213,7 +213,7 @@ class SnapBot:
             print("💼 EXECUTING TRADES")
             print(f"{'='*60}")
 
-            for signal in signals[:2]:
+            for signal in signals[:3]:
                 market           = signal['market']
                 side             = signal['side']
                 size             = signal['position_size']
