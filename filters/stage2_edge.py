@@ -1,6 +1,7 @@
 """
 STAGE 2: EDGE CHECK
 FIX 3: Edge detection untuk semua kategori market, bukan cuma crypto
+FIX 6: Filter edge negatif ekstrim (false signal)
 """
 from typing import Dict, Tuple
 import sys
@@ -11,23 +12,10 @@ from data.crypto_price import crypto_fetcher
 
 
 def _mean_reversion(price: float, strength: float = 0.5) -> float:
-    """
-    Tarik harga ke arah 0.5 dengan kekuatan tertentu.
-
-    strength=0.0 → tidak berubah sama sekali
-    strength=1.0 → selalu return 0.5
-    strength=0.4 → harga 0.30 jadi 0.30 + (0.5-0.30)*0.4 = 0.38
-
-    Logika: market sering overreact, probabilitas true
-    lebih dekat ke tengah dari harga pasar.
-    """
     return price + (0.5 - price) * strength
 
 
 def get_estimated_probability(market: Dict) -> float:
-    """
-    Estimasi probabilitas true dari berbagai sumber per kategori.
-    """
     question      = market.get('question', '').lower()
     current_price = market.get('price', 0.5)
 
@@ -45,14 +33,13 @@ def get_estimated_probability(market: Dict) -> float:
         return prob if prob else current_price
 
     # === POLITICS ===
-    # Polymarket cenderung overpricing Trump/Republican karena hype
     if any(kw in question for kw in ['trump', 'republican']):
         print(f"   [DEBUG] Category: politics (right)")
-        return current_price * 0.97  # deflate 3%
+        return current_price * 0.97
 
     if any(kw in question for kw in ['democrat', 'biden', 'harris', 'kamala']):
         print(f"   [DEBUG] Category: politics (left)")
-        return current_price * 1.02  # slight underpriced
+        return current_price * 1.02
 
     if any(kw in question for kw in ['election', 'vote', 'president', 'senate',
                                       'congress', 'poll', 'approve']):
@@ -60,7 +47,6 @@ def get_estimated_probability(market: Dict) -> float:
         return _mean_reversion(current_price, strength=0.35)
 
     # === SPORTS ===
-    # Market sports relatif efisien, mean reversion ringan
     if any(kw in question for kw in ['win', 'beat', 'champion', 'title',
                                       'nba', 'nfl', 'nhl', 'mlb', 'ufc', 'mma',
                                       'soccer', 'football', 'basketball', 'tennis',
@@ -70,7 +56,6 @@ def get_estimated_probability(market: Dict) -> float:
         return _mean_reversion(current_price, strength=0.25)
 
     # === ENTERTAINMENT / CULTURE ===
-    # Lebih volatile dan kurang efisien dari sports
     if any(kw in question for kw in ['release', 'album', 'movie', 'film', 'song',
                                       'award', 'oscar', 'grammy', 'emmy', 'gta',
                                       'rihanna', 'taylor', 'beyonce', 'kanye',
@@ -85,7 +70,7 @@ def get_estimated_probability(market: Dict) -> float:
         print(f"   [DEBUG] Category: crypto (alt)")
         return _mean_reversion(current_price, strength=0.55)
 
-    # === GEOPOLITICS / WORLD EVENTS ===
+    # === GEOPOLITICS ===
     if any(kw in question for kw in ['war', 'invasion', 'nato', 'china', 'russia',
                                       'taiwan', 'sanction', 'nuclear', 'ceasefire',
                                       'peace', 'treaty']):
@@ -105,7 +90,6 @@ def get_estimated_probability(market: Dict) -> float:
 
 
 def calculate_edge(market_price: float, estimated_prob: float) -> float:
-    """Hitung edge dalam persen."""
     return (estimated_prob - market_price) * 100
 
 
@@ -128,6 +112,13 @@ def edge_check(market: Dict, threshold: float = 3.0) -> Tuple[bool, str, float, 
         'threshold_used': threshold,
     }
 
+    # FIX 6: Tolak edge negatif ekstrim — hampir pasti false signal
+    if edge < -20:
+        return (False,
+                f"❌ Edge negatif ekstrim: {edge:.2f}% (false signal)",
+                edge, None, edge_data)
+
+    # Tolak edge terlalu kecil
     if edge_abs < threshold - 0.001:
         return (False,
                 f"❌ Edge too small: {edge_abs:.2f}% (need {threshold}%)",
@@ -151,6 +142,7 @@ if __name__ == "__main__":
         {'question': 'GTA 6 releases before July 2025?',   'price': 0.70},
         {'question': 'Fed cuts rates in September?',        'price': 0.35},
         {'question': 'Will Russia invade another country?', 'price': 0.20},
+        {'question': 'Will bitcoin hit $1m before GTA VI?','price': 0.49},
     ]
 
     print("=" * 60)

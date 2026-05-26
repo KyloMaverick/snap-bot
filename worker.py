@@ -5,9 +5,6 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Reset DB sekali
-os.remove("snap_bot_data.db") if os.path.exists("snap_bot_data.db") else None
-
 from main import SnapBot
 
 print("=" * 60)
