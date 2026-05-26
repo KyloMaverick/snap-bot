@@ -27,7 +27,7 @@ class PolymarketAPI:
             time.sleep(self.min_interval - elapsed)
         self.last_request_time = time.time()
     
-    def get_markets(self, limit: int = 10) -> List[Dict]:
+    def get_markets(self, limit: int = 50) -> List[Dict]:
         """Ambil daftar market dari Polymarket"""
         self._rate_limit()
         

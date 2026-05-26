@@ -161,7 +161,7 @@ class SnapBot:
         print(f"   Time: {datetime.now().strftime('%H:%M:%S')}")
         print(f"{'='*60}")
         
-        markets = self.api.get_markets(limit=20)
+        markets = self.api.get_markets(limit=50)
         self.last_markets = markets
         
         if not markets:

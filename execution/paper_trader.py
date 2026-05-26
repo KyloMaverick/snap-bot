@@ -210,4 +210,3 @@ class PaperTrader:
         print(f"   Wins/Losses:    {stats['winning_trades']}/{stats['losing_trades']}")
         print(f"   Winrate:        {stats['winrate']}%")
         print("=" * 50)
- 

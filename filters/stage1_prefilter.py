@@ -37,14 +37,14 @@ def prefilter(market: Dict) -> Tuple[bool, str, Dict]:
     }
     
     # 1. Cek harga (hindari ujung ekstrim)
-    if price < 0.15:
-        return False, f"Harga terlalu rendah: {price:.3f} (min 0.15)", None
-    if price > 0.85:
-        return False, f"Harga terlalu tinggi: {price:.3f} (max 0.85)", None
+    if price < 0.10:
+        return False, f"Harga terlalu rendah: {price:.3f} (min 0.10)", None
+    if price > 0.90:
+        return False, f"Harga terlalu tinggi: {price:.3f} (max 0.90)", None
     
     # 2. Cek volume (minimal likuiditas)
-    if volume < 50000:
-        return False, f"Volume terlalu rendah: ${volume:,.0f} (min $50k)", None
+    if volume < 10000:
+        return False, f"Volume terlalu rendah: ${volume:,.0f} (min $10k)", None
     
     # 3. Cek status aktif
     if not active:
