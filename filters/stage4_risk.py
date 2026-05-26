@@ -13,7 +13,7 @@ class RiskChecker:
         self.daily_trades = 0
         self.daily_loss_limit = -6.0  # -6% max daily loss
         self.max_consecutive_losses = 3
-        self.max_open_positions = 2
+        self.max_open_positions = 3
         self.max_daily_trades = 20
     
     def update_after_trade(self, pnl_pct: float, is_win: bool):

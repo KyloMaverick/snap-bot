@@ -39,7 +39,7 @@ def get_estimated_probability(market: Dict) -> float:
         prob = crypto_fetcher.get_probability_from_price(question, current_price)
         return prob if prob else current_price
 
-    if any(kw in question for kw in ['eth', 'ethereum']):
+    if any(kw in question.split() for kw in ['eth', 'ethereum']):
         print(f"   [DEBUG] Category: crypto (ETH)")
         prob = crypto_fetcher.get_probability_from_price(question, current_price)
         return prob if prob else current_price

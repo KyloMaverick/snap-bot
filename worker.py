@@ -5,16 +5,17 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+# Reset DB sekali
+os.remove("snap_bot_data.db") if os.path.exists("snap_bot_data.db") else None
+
 from main import SnapBot
 
 print("=" * 60)
 print("🤖 SNAP BOT - RAILWAY WORKER")
 print("=" * 60)
 
-# START TELEGRAM COMMAND
 cmd_handler.start()
 
-# START TRADING BOT
 bot = SnapBot(mode="AGGRESSIVE", paper_mode=True)
 
 while True:
